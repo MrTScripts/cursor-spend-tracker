@@ -3,6 +3,71 @@ import * as https from 'https';
 import * as path from 'path';
 import * as os from 'os';
 
+// ====== Cookie Parsing Helpers ======
+
+/**
+ * Extract WorkosCursorSessionToken from a cookie string or curl -b header
+ */
+function extractSessionCookie(input: string): string | null {
+  // Try to extract from cookie header format: "key1=value1; key2=value2; ..."
+  const cookieMatch = input.match(/WorkosCursorSessionToken=([^;]+)/);
+  if (cookieMatch) {
+    return cookieMatch[1];
+  }
+
+  // Try to extract from curl -b format (same structure)
+  // The -b flag can have the cookies as a string
+  return null;
+}
+
+/**
+ * Try to extract session cookie from a curl command string
+ * Looks for patterns like: -b 'cookie_string' or --cookie 'cookie_string'
+ */
+function extractCookieFromCurl(input: string): string | null {
+  // Match -b '...' or --cookie '...'
+  const curlCookieMatch = input.match(/(?:-b|--cookie)\s+['"]([^'"]+)['"]/);
+  if (curlCookieMatch) {
+    const cookies = curlCookieMatch[1];
+    const sessionMatch = cookies.match(/WorkosCursorSessionToken=([^;]+)/);
+    if (sessionMatch) {
+      return sessionMatch[1];
+    }
+  }
+  return null;
+}
+
+/** Paste is only the value: user_xxx::jwt or user_xxx%3A%3Ajwt (no cookie name) */
+function extractBareSessionValue(input: string): string | null {
+  const t = input.trim();
+  if (!t || /WorkosCursorSessionToken\s*=/i.test(t)) {
+    return null;
+  }
+  if (/^user_[a-zA-Z0-9_]+(::|%3A%3A).+/.test(t)) {
+    return t;
+  }
+  return null;
+}
+
+/**
+ * DevTools often shows URL-encoded cookie values (%3A%3A for ::). Encoding again breaks the session.
+ */
+function normalizeSessionTokenForStorage(raw: string): string {
+  const t = raw.trim();
+  if (!/%[0-9A-Fa-f]{2}/.test(t)) {
+    return t;
+  }
+  try {
+    const d = decodeURIComponent(t);
+    if (d.startsWith('user_') && d.includes('::')) {
+      return d;
+    }
+  } catch {
+    /* keep raw */
+  }
+  return t;
+}
+
 interface UsageEvent {
   timestamp: string;
   model: string;
@@ -35,7 +100,14 @@ function getStateDbPath(): string {
   return path.join(os.homedir(), '.config', 'Cursor', 'User', 'globalStorage', 'state.vscdb');
 }
 
-async function readSessionTokenFromDb(): Promise<string | null> {
+async function readSessionTokenFromDb(context: vscode.ExtensionContext): Promise<string | null> {
+  // First check if user manually set a session cookie
+  const manualCookie = context.globalState.get<string>('sessionCookie', '');
+  if (manualCookie) {
+    return manualCookie;
+  }
+
+  // Fall back to reading from Cursor's local database
   const { execFile } = await import('child_process');
   const { promisify } = await import('util');
   const exec = promisify(execFile);
@@ -53,6 +125,41 @@ async function readSessionTokenFromDb(): Promise<string | null> {
   } catch {
     return null;
   }
+}
+
+/**
+ * Prompt user to paste session cookie or curl command and extract the token.
+ * Returns true if a token was saved.
+ */
+async function setSessionCookie(context: vscode.ExtensionContext): Promise<boolean> {
+  const input = await vscode.window.showInputBox({
+    prompt: 'Paste WorkosCursorSessionToken value, full cookie, or curl -b',
+    placeHolder: 'user_…::eyJ… or WorkosCursorSessionToken=user_…',
+    password: false
+  });
+
+  if (!input) {
+    return false;
+  }
+
+  let token: string | null =
+    extractSessionCookie(input) ??
+    extractCookieFromCurl(input) ??
+    extractBareSessionValue(input);
+
+  if (token) {
+    token = normalizeSessionTokenForStorage(token);
+    await context.globalState.update('sessionCookie', token);
+    await vscode.window.showInformationMessage(
+      'Cursor Spend: session cookie saved. Refreshing usage…'
+    );
+    return true;
+  }
+
+  await vscode.window.showErrorMessage(
+    'Cursor Spend: could not parse input. Use WorkosCursorSessionToken=… or paste the raw user_…::… value.'
+  );
+  return false;
 }
 
 function httpsPost(url: string, token: string, body: object): Promise<string> {
@@ -320,7 +427,7 @@ export function activate(context: vscode.ExtensionContext) {
   }
 
   async function refresh() {
-    const token = await readSessionTokenFromDb();
+    const token = await readSessionTokenFromDb(context);
     if (!token) {
       statusBar.text = '$(credit-card) Cursor: not logged in';
       statusBar.tooltip = 'Could not read auth token from Cursor — are you logged in?';
@@ -356,6 +463,14 @@ export function activate(context: vscode.ExtensionContext) {
         ? `https://cursor.com/dashboard?tab=usage&user=${uid}`
         : 'https://cursor.com/dashboard?tab=usage';
       vscode.env.openExternal(vscode.Uri.parse(url));
+    }),
+    vscode.commands.registerCommand('cursorSpendTracker.setSessionCookie', async () => {
+      const ok = await setSessionCookie(context);
+      if (ok) {
+        statusBar.text = '$(loading~spin) Cursor $…';
+        await refresh();
+        scheduleRefresh();
+      }
     }),
   );
 

@@ -28,6 +28,11 @@
           "type": "number",
           "default": 2.0,
           "description": "Threshold in USD for a costly request (for alerts and tracking)"
+        },
+        "cursorSpendTracker.sessionCookie": {
+          "type": "string",
+          "default": "",
+          "description": "Manual session cookie (WorkosCursorSessionToken) for API access. Leave empty to auto-detect from Cursor."
         }
       }
     },
@@ -39,6 +44,10 @@
       {
         "command": "cursorSpendTracker.openDashboard",
         "title": "Cursor Spend: Open Dashboard"
+      },
+      {
+        "command": "cursorSpendTracker.setSessionCookie",
+        "title": "Cursor Spend: Set Session Cookie"
       }
     ]
   },
