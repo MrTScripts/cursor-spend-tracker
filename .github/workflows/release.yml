@@ -42,8 +42,8 @@ jobs:
 
       - name: Upload to Release
         uses: softprops/action-gh-release@v1
-        if: github.event_name == 'release'
         with:
+          tag_name: ${{ github.ref_name }}
           files: cursor-spend-tracker-${{ steps.version.outputs.version }}.vsix
 
       - name: Upload artifact
