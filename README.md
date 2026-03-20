@@ -2,7 +2,6 @@
 
 [![CI](https://img.shields.io/github/actions/workflow/status/maurice2k/cursor-spend-tracker/ci.yml?branch=main&style=flat-square)](https://github.com/maurice2k/cursor-spend-tracker/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
-[![Cursor](https://img.shields.io/badge/Cursor-Extension-141414?style=flat-square&logo=cursor&logoColor=white)](https://cursor.com/)
 
 A [Cursor](https://cursor.com/) extension that shows your on-demand spend in the status bar (not useful with plain VS Code).
 
